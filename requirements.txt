@@ -1,14 +1,3 @@
 flask
 yt-dlp
 gunicorn
-```[cite: 1]
-
-ഇത് നിങ്ങളുടെ പ്രൊജക്റ്റിലെ `requirements.txt` ഫയലിൽ പൂർണ്ണമായി സേവ് ചെയ്ത ശേഷം താഴെയുള്ള സ്റ്റെപ്പുകൾ ചെയ്യുക:
-
-<Steps>
-<Step subtitle="Git Push" title="1. മാറ്റങ്ങൾ ഗിറ്റിലേക്ക് പുഷ് ചെയ്യുക">
-  പവർഷെൽ തുറന്ന് താഴെയുള്ള കമാൻഡുകൾ ഓരോന്നായി നൽകുക:
-  ```bash
-  git add requirements.txt
-  git commit -m "Fix requirements for render build"
-  git push origin main
