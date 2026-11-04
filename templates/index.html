@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EasySave - Media Downloader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #f4d98a;
+    --gold-dark: #8a6d2f;
+    --ink: #0d0a24;
+    --panel: #151038;
+    --panel-2: #1f1750;
+    --green: #3ddc97;
+    --red: #ff5d73;
+    --pixel: 'Press Start 2P', 'Courier New', monospace;
+    --mx: 0;
+    --my: 0;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    color: #f3efe0;
+    background: #0b0a24;
+    overflow: hidden;
+  }
+
+  /* ============================ RPG WALLPAPER ============================ */
+  .scene { position: fixed; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+  .sky {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, #080720 0%, #1c1451 38%, #5b2a63 68%, #d9804d 100%);
+    background-size: 100% 140%;
+    animation: skyShift 40s ease-in-out infinite alternate;
+  }
+  @keyframes skyShift { from { background-position: 0 0; } to { background-position: 0 100%; } }
+
+  .stars { position: absolute; inset: 0 0 40% 0; }
+  .star {
+    position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%;
+    animation: twinkle var(--d, 3s) ease-in-out infinite; animation-delay: var(--delay, 0s);
+  }
+  @keyframes twinkle { 0%, 100% { opacity: .15; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.6); } }
+
+  .shooting {
+    position: absolute; top: 12%; left: 70%; width: 120px; height: 2px;
+    background: linear-gradient(90deg, #fff, transparent);
+    transform: rotate(-25deg); opacity: 0;
+    animation: shoot 11s linear infinite; animation-delay: 4s;
+  }
+  @keyframes shoot {
+    0% { opacity: 0; transform: translate(0, 0) rotate(-25deg); }
+    2% { opacity: 1; }
+    8% { opacity: 0; transform: translate(-420px, 190px) rotate(-25deg); }
+    100% { opacity: 0; }
+  }
+
+  .moon {
+    position: absolute; top: 9%; left: 12%; width: 90px; height: 90px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fffbe8, #f4e6b0 60%, #d9c98a);
+    box-shadow: 0 0 40px 12px rgba(255, 244, 190, .35), 0 0 120px 40px rgba(255, 236, 160, .18);
+    animation: moonGlow 6s ease-in-out infinite alternate;
+  }
+  @keyframes moonGlow { to { box-shadow: 0 0 60px 20px rgba(255, 244, 190, .5), 0 0 160px 60px rgba(255, 236, 160, .25); } }
+
+  .cloud {
+    position: absolute; left: -30%; height: 34px; width: 150px; border-radius: 40px;
+    background: rgba(255, 220, 200, .16); filter: blur(2px);
+    animation: drift var(--t, 70s) linear infinite; animation-delay: var(--delay, 0s);
+  }
+  .cloud::before, .cloud::after { content: ''; position: absolute; background: inherit; border-radius: 50%; }
+  .cloud::before { width: 60px; height: 50px; left: 20px; top: -22px; }
+  .cloud::after { width: 46px; height: 40px; left: 70px; top: -14px; }
+  @keyframes drift { to { transform: translateX(160vw); } }
+
+  .layer, .castle, .trees-wrap {
+    position: absolute; left: -3%; width: 106%; bottom: 0;
+    transition: transform .25s ease-out;
+  }
+  .layer svg, .trees-wrap svg { display: block; width: 100%; height: 100%; }
+  .far  { height: 46vh; transform: translate(calc(var(--mx) * -6px),  calc(var(--my) * -3px)); }
+  .mid  { height: 36vh; transform: translate(calc(var(--mx) * -12px), calc(var(--my) * -5px)); }
+  .near { height: 22vh; transform: translate(calc(var(--mx) * -22px), calc(var(--my) * -8px)); }
+  .trees-wrap { height: 20vh; transform: translate(calc(var(--mx) * -34px), calc(var(--my) * -10px)); }
+
+  .castle {
+    left: auto; right: 7%; width: auto; height: 40vh; bottom: 10vh;
+    transform: translate(calc(var(--mx) * -14px), calc(var(--my) * -5px));
+    filter: drop-shadow(0 0 18px rgba(255, 160, 80, .18));
+  }
+  .castle svg { height: 100%; width: auto; display: block; }
+  .win { fill: #ffcf5a; animation: flicker var(--d, 2.4s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+  @keyframes flicker { 0%, 100% { opacity: 1; } 45% { opacity: .55; } 60% { opacity: .95; } 80% { opacity: .7; } }
+  .flag { transform-origin: 150px -26px; animation: wave 2.2s ease-in-out infinite; }
+  @keyframes wave { 0%, 100% { transform: skewY(0deg) scaleX(1); } 50% { transform: skewY(8deg) scaleX(.82); } }
+
+  .fireflies { position: absolute; inset: 0; }
+  .fly {
+    position: absolute; width: 4px; height: 4px; border-radius: 50%;
+    background: #d8ff7a; box-shadow: 0 0 8px 3px rgba(216, 255, 122, .7);
+    opacity: 0; animation: float var(--dur, 12s) ease-in-out infinite; animation-delay: var(--delay, 0s);
+  }
+  @keyframes float {
+    0% { opacity: 0; transform: translate(0, 0); }
+    15% { opacity: 1; }
+    50% { transform: translate(var(--dx, 40px), -22vh); opacity: .9; }
+    85% { opacity: 1; }
+    100% { opacity: 0; transform: translate(calc(var(--dx, 40px) * -1), -46vh); }
+  }
+
+  /* ============================ CARD ============================ */
+  .stage {
+    position: relative; z-index: 2; height: 100%;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+  }
+  .card {
+    position: relative; width: min(94vw, 430px); padding: 26px 24px 20px; text-align: center;
+    background: linear-gradient(160deg, var(--panel-2), var(--panel));
+    border: 4px solid var(--gold);
+    border-radius: 6px;
+    box-shadow:
+      0 0 0 4px var(--ink),
+      0 0 0 7px var(--gold-dark),
+      0 24px 60px rgba(0, 0, 0, .6),
+      inset 0 0 40px rgba(120, 90, 255, .15);
+    animation: popIn .7s cubic-bezier(.2, 1.3, .4, 1) both, bob 5s ease-in-out .8s infinite;
+  }
+  .card:hover, .card:focus-within { animation-play-state: paused, paused; }
+  @keyframes popIn { from { opacity: 0; transform: translateY(40px) scale(.9); } to { opacity: 1; transform: none; } }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .gem {
+    position: absolute; width: 12px; height: 12px; background: var(--gold); transform: rotate(45deg);
+    box-shadow: 0 0 10px 2px rgba(244, 217, 138, .7); animation: gemPulse 2.4s ease-in-out infinite;
+  }
+  .gem.tl { top: -9px; left: -9px; } .gem.tr { top: -9px; right: -9px; animation-delay: .6s; }
+  .gem.bl { bottom: -9px; left: -9px; animation-delay: 1.2s; } .gem.br { bottom: -9px; right: -9px; animation-delay: 1.8s; }
+  @keyframes gemPulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.7); } }
+
+  h1 {
+    font-family: var(--pixel); font-size: 22px; line-height: 1.3; margin: 0 0 8px; letter-spacing: 1px;
+    color: var(--gold); text-shadow: 3px 3px 0 #5a3b0c, 0 0 18px rgba(244, 217, 138, .6);
+    animation: titleGlow 3s ease-in-out infinite alternate;
+  }
+  @keyframes titleGlow { to { text-shadow: 3px 3px 0 #5a3b0c, 0 0 30px rgba(244, 217, 138, .95); } }
+  .by { margin: 0; font-size: 12px; color: #a9a2d6; }
+  .device { margin: 4px 0 12px; font-size: 12px; color: var(--green); font-weight: 600; }
+
+  .device { margin-bottom: 18px; }
+
+  label { display: block; text-align: left; font-family: var(--pixel); font-size: 9px; color: var(--gold); margin: 0 0 8px; }
+  .field { margin-bottom: 16px; }
+  input[type=text], select {
+    width: 100%; padding: 13px 14px; font-size: 15px; color: #fff; background: #0c0830;
+    border: 2px solid #4a3f94; border-radius: 4px; outline: none; transition: border-color .2s, box-shadow .2s;
+  }
+  input[type=text]:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(244, 217, 138, .25), 0 0 18px rgba(244, 217, 138, .25); }
+  input::placeholder { color: #7f78b3; }
+  select option:disabled { color: #777; }
+
+  .badge {
+    display: none; margin: -6px 0 14px; padding: 9px 11px; text-align: left; font-size: 12px; line-height: 1.45;
+    background: rgba(61, 220, 151, .12); border: 1px solid rgba(61, 220, 151, .5); color: #b8ffe0; border-radius: 4px;
+    animation: slideDown .35s ease both;
+  }
+  .badge.show { display: block; }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+  .quality { display: none; }
+  .quality.show { display: block; animation: slideDown .35s ease both; }
+  .chips { display: flex; gap: 8px; }
+  .chip { flex: 1; position: relative; margin: 0; }
+  .chip input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+  .chip span {
+    display: block; padding: 10px 0; text-align: center; font-size: 12px; font-weight: 700; color: #cfc8ff;
+    background: #0c0830; border: 2px solid #4a3f94; border-radius: 4px; transition: all .2s; font-family: system-ui, sans-serif;
+  }
+  .chip input:checked + span { color: #1b1200; background: var(--gold); border-color: #fff3c4; box-shadow: 0 0 14px rgba(244, 217, 138, .6); transform: translateY(-2px); }
+  .chip input:focus-visible + span { outline: 2px solid #fff; outline-offset: 2px; }
+
+  .btn {
+    position: relative; overflow: hidden; width: 100%; padding: 15px 12px; cursor: pointer;
+    font-family: var(--pixel); font-size: 12px; color: #072b1b; letter-spacing: .5px;
+    background: linear-gradient(180deg, #7dffc0, #2fcf86); border: 3px solid #d9ffee; border-radius: 4px;
+    box-shadow: 0 5px 0 #14825a, 0 10px 24px rgba(61, 220, 151, .35);
+    transition: transform .1s, box-shadow .1s, filter .2s;
+  }
+  .btn::after {
+    content: ''; position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .7), transparent);
+    transform: skewX(-20deg); animation: shine 3.2s ease-in-out infinite;
+  }
+  @keyframes shine { 0% { left: -60%; } 40%, 100% { left: 130%; } }
+  .btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #14825a, 0 4px 12px rgba(61, 220, 151, .3); }
+  .btn:disabled { filter: grayscale(.7) brightness(.8); cursor: not-allowed; transform: none; }
+  .foot { margin: 14px 0 0; font-size: 11px; color: #8c85c2; }
+
+  /* ============================ TOASTS ============================ */
+  .toasts { position: fixed; z-index: 30; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 10px; width: min(92vw, 340px); }
+  .toast {
+    padding: 12px 14px; font-size: 13px; line-height: 1.4; border-radius: 4px; color: #fff;
+    background: var(--panel); border: 2px solid var(--gold); box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+    animation: toastIn .4s cubic-bezier(.2, 1.3, .4, 1) both;
+  }
+  .toast.error { border-color: var(--red); } .toast.success { border-color: var(--green); }
+  .toast.out { animation: toastOut .35s ease forwards; }
+  @keyframes toastIn { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: none; } }
+  @keyframes toastOut { to { opacity: 0; transform: translateX(60px); } }
+
+  /* ============================ MODAL ============================ */
+  .overlay {
+    position: fixed; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; padding: 16px;
+    background: rgba(5, 3, 20, .72); backdrop-filter: blur(5px);
+  }
+  .overlay.show { display: flex; animation: fade .25s ease both; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    width: min(94vw, 400px); max-height: 94vh; overflow-y: auto; padding: 22px 20px 18px; text-align: center; border-radius: 6px;
+    background: linear-gradient(160deg, var(--panel-2), var(--panel)); border: 4px solid var(--gold);
+    box-shadow: 0 0 0 4px var(--ink), 0 0 0 7px var(--gold-dark), 0 30px 70px rgba(0, 0, 0, .7);
+    animation: modalPop .45s cubic-bezier(.2, 1.4, .4, 1) both;
+  }
+  @keyframes modalPop { from { opacity: 0; transform: scale(.7) translateY(20px); } to { opacity: 1; transform: none; } }
+  .modal h2 { font-family: var(--pixel); font-size: 14px; line-height: 1.5; margin: 14px 0 10px; color: var(--gold); }
+  .modal p { margin: 0 0 6px; font-size: 14px; line-height: 1.5; color: #d9d4ff; }
+  .modal .tip { min-height: 22px; color: #a9a2d6; font-size: 13px; }
+  .pane { display: none; } .pane.show { display: block; }
+  .modal .btn { margin-top: 16px; font-size: 11px; padding: 13px 10px; }
+  .btn.ghost { background: transparent; color: var(--gold); border-color: var(--gold-dark); box-shadow: none; }
+  .btn.ghost::after { display: none; }
+  .btn.danger { background: linear-gradient(180deg, #ff93a1, #e8455d); color: #3a0510; border-color: #ffd5db; box-shadow: 0 5px 0 #a02033; }
+
+  .rune { width: 74px; height: 74px; margin: 0 auto; position: relative; }
+  .rune i { position: absolute; inset: 0; border-radius: 50%; border: 4px solid transparent; }
+  .rune i:nth-child(1) { border-top-color: var(--gold); border-bottom-color: var(--gold); animation: spin 1.4s linear infinite; }
+  .rune i:nth-child(2) { inset: 12px; border-left-color: var(--green); border-right-color: var(--green); animation: spin 1s linear infinite reverse; }
+  .rune i:nth-child(3) { inset: 26px; background: var(--gold); border: 0; box-shadow: 0 0 20px 6px rgba(244, 217, 138, .7); animation: gemPulse 1s ease-in-out infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .hp { height: 14px; margin: 16px 0 12px; background: #0a0720; border: 2px solid var(--gold-dark); border-radius: 3px; overflow: hidden; position: relative; }
+  .hp::before {
+    content: ''; position: absolute; top: 0; bottom: 0; width: 40%;
+    background: linear-gradient(90deg, #3ddc97, #b6ff6a, #3ddc97); box-shadow: 0 0 12px #3ddc97;
+    animation: hpSlide 1.4s ease-in-out infinite;
+  }
+  @keyframes hpSlide { 0% { left: -40%; } 100% { left: 100%; } }
+
+  .check { width: 84px; height: 84px; margin: 0 auto; position: relative; }
+  .check svg { width: 100%; height: 100%; }
+  .check circle { fill: none; stroke: var(--green); stroke-width: 5; stroke-dasharray: 260; stroke-dashoffset: 260; animation: draw .6s ease forwards; }
+  .check path { fill: none; stroke: #b6ffe0; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 60; stroke-dashoffset: 60; animation: draw .4s ease .5s forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .spark {
+    position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; background: var(--gold); border-radius: 2px;
+    opacity: 0; animation: burst .9s ease-out .55s forwards;
+  }
+  @keyframes burst { 0% { opacity: 1; transform: translate(-50%, -50%) rotate(0); } 100% { opacity: 0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(360deg); } }
+
+  .cross { width: 84px; height: 84px; margin: 0 auto; font-size: 54px; line-height: 84px; color: var(--red); animation: shake .5s ease; text-shadow: 0 0 20px rgba(255, 93, 115, .7); }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-9px); } 40%, 80% { transform: translateX(9px); } }
+  .errmsg { max-height: 220px; overflow: auto; padding: 8px 10px; background: rgba(255, 93, 115, .1); border: 1px solid rgba(255, 93, 115, .45); border-radius: 4px; font-size: 13px; text-align: left; word-break: break-word; }
+
+  /* ---- Spotify playlist / album list ---- */
+  .list-head { margin: 0 0 4px; font-family: var(--pixel); font-size: 11px; line-height: 1.5; color: var(--gold); word-break: break-word; }
+  .list-sub { margin: 0 0 10px; font-size: 12px; color: #a9a2d6; }
+  .tracks { max-height: 38vh; overflow-y: auto; margin: 0 0 4px; padding: 0; list-style: none; text-align: left; border: 2px solid var(--gold-dark); border-radius: 4px; background: #0a0720; }
+  .tracks li { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid rgba(255, 255, 255, .07); font-size: 13px; }
+  .tracks li:last-child { border-bottom: 0; }
+  .tracks .n { flex: 0 0 auto; width: 22px; color: #7f78b3; font-size: 11px; text-align: right; }
+  .tracks .meta { flex: 1; min-width: 0; }
+  .tracks .meta b, .tracks .meta span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tracks .meta span { font-size: 11px; color: #a9a2d6; }
+  .tracks .st-ic { flex: 0 0 auto; width: 20px; text-align: center; font-size: 14px; }
+  .tracks .st-ic.ok { color: var(--green); } .tracks .st-ic.bad { color: var(--red); }
+  .tracks .go { flex: 0 0 auto; padding: 5px 9px; font-size: 14px; line-height: 1; cursor: pointer; color: var(--gold); background: transparent; border: 2px solid var(--gold-dark); border-radius: 4px; }
+  .tracks .go:hover:not(:disabled) { background: rgba(244, 217, 138, .15); }
+  .tracks .go:disabled { opacity: .4; cursor: not-allowed; }
+  .tracks li.running { background: rgba(61, 220, 151, .1); }
+  .row-btns { display: flex; gap: 8px; }
+  .row-btns .btn { margin-top: 12px; }
+
+  /* ============================ INSTAGRAM BANNER ============================ */
+  .ig {
+    display: block; margin: 14px 0 0; padding: 11px 12px; border-radius: 4px; text-decoration: none; color: #fff; font-size: 13px;
+    background: linear-gradient(90deg, #833ab4, #c13584, #e1306c, #c13584, #833ab4); background-size: 300% 100%;
+    animation: igMove 6s linear infinite; box-shadow: 0 0 16px rgba(225, 48, 108, .35); transition: transform .15s;
+  }
+  .ig:hover { transform: translateY(-2px); }
+  .ig b { font-weight: 800; }
+  @keyframes igMove { to { background-position: 300% 0; } }
+  .ig-line { font-size: 13px; color: #cfc8ff; }
+  .ig-line a { color: var(--gold); font-weight: 700; }
+
+  /* ============================ PROMO VIDEO (inside loading popup) ============================ */
+  .promo { position: relative; height: 190px; margin: 0 0 12px; overflow: hidden; border-radius: 4px; border: 2px solid var(--gold-dark); background: #0a0720; }
+  .promo::after { content: ''; position: absolute; inset: 0; z-index: 4; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .13) 0 1px, transparent 1px 3px); }
+  .tag { position: absolute; z-index: 5; bottom: 6px; right: 8px; font-family: var(--pixel); font-size: 6px; padding: 3px 5px; color: var(--gold); background: rgba(0, 0, 0, .55); border-radius: 2px; }
+  .seg { position: absolute; z-index: 5; top: 7px; left: 8px; right: 8px; display: flex; gap: 4px; }
+  .seg b { flex: 1; height: 3px; overflow: hidden; border-radius: 2px; background: rgba(255, 255, 255, .25); }
+  .seg i { display: block; height: 100%; width: 0; background: #fff; }
+  .seg i.done { width: 100%; }
+  .seg i.run { animation: segFill 3.6s linear forwards; }
+  @keyframes segFill { to { width: 100%; } }
+
+  .sc { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px; padding: 22px 12px 10px; opacity: 0; visibility: hidden; transition: opacity .3s; }
+  .sc.active { opacity: 1; visibility: visible; }
+  .s1 { background: radial-gradient(circle at 50% 130%, #6a1b45, #150c33 70%); }
+  .s2 { background: radial-gradient(circle at 50% 40%, #3b2a8a, #0d0a28 75%); }
+  .s3 { background: radial-gradient(circle at 50% 120%, #0d5a49, #0d0a28 72%); }
+  .s4 { background: radial-gradient(circle at 50% 100%, #7a1f5c, #160a33 72%); }
+  .big { font-family: var(--pixel); font-size: 12px; line-height: 1.5; color: var(--gold); text-shadow: 2px 2px 0 #3b2506; }
+  .sub { font-size: 12px; color: #d9d4ff; }
+
+  /* scene 1: hook */
+  .sc.active .t1 { animation: slam .45s both; }
+  .track { position: relative; width: 78%; height: 34px; border-bottom: 2px dashed #6b5aa8; }
+  .snail { position: absolute; bottom: 0; left: 0; font-size: 26px; }
+  .sc.active .snail { animation: crawl 1.9s ease-in forwards, zoomOff .6s 1.9s ease-in forwards; }
+  @keyframes crawl { to { left: calc(100% - 30px); } }
+  @keyframes zoomOff { from { left: calc(100% - 30px); opacity: 1; } to { left: 150%; opacity: 0; } }
+  .t2 { opacity: 0; color: #fff; text-shadow: 0 0 14px #ffd84a, 2px 2px 0 #7a4a00; }
+  .sc.active .t2 { animation: slam .5s 1.9s both; }
+  @keyframes slam { from { opacity: 0; transform: scale(2.4); } to { opacity: 1; transform: none; } }
+  .flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+  .sc.active .flash { animation: flashAnim .5s 1.9s ease-out; }
+  @keyframes flashAnim { 0% { opacity: 0; } 20% { opacity: .85; } 100% { opacity: 0; } }
+
+  /* scene 2: logo */
+  .sword { font-size: 34px; }
+  .sc.active .sword { animation: spinIn .7s cubic-bezier(.2, 1.3, .4, 1) both; }
+  @keyframes spinIn { from { opacity: 0; transform: rotate(-360deg) scale(0); } to { opacity: 1; transform: none; } }
+  .logo { font-family: var(--pixel); font-size: 20px; color: var(--gold); text-shadow: 3px 3px 0 #5a3b0c, 0 0 20px rgba(244, 217, 138, .8); }
+  .sc.active .logo { animation: slam .5s .35s both; }
+  .pills { display: flex; gap: 6px; }
+  .pills span { padding: 4px 8px; font-size: 11px; font-weight: 700; color: #fff; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .35); border-radius: 20px; opacity: 0; }
+  .sc.active .pills span { animation: slideUp .45s both; }
+  .sc.active .pills span:nth-child(1) { animation-delay: 1s; }
+  .sc.active .pills span:nth-child(2) { animation-delay: 1.2s; }
+  .sc.active .pills span:nth-child(3) { animation-delay: 1.4s; }
+  .s2 .sub { opacity: 0; }
+  .sc.active.s2 .sub { animation: slideUp .5s 1.8s both; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* scene 3: steps */
+  .steps { display: flex; align-items: center; gap: 8px; }
+  .steps i { font-style: normal; font-size: 10px; color: var(--gold); opacity: 0; }
+  .st { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 68px; padding: 9px 6px; font-family: var(--pixel); font-size: 8px; color: #fff; background: rgba(255, 255, 255, .1); border: 2px solid rgba(255, 255, 255, .3); border-radius: 4px; opacity: 0; }
+  .st em { font-style: normal; font-size: 22px; }
+  .sc.active .st { animation: pop .45s cubic-bezier(.2, 1.5, .4, 1) both; }
+  .sc.active .st:nth-child(1) { animation-delay: .2s; }
+  .sc.active .st:nth-child(3) { animation-delay: .9s; }
+  .sc.active .st:nth-child(5) { animation-delay: 1.6s; }
+  .sc.active .steps i { animation: fadeIn .3s both; }
+  .sc.active .steps i:nth-child(2) { animation-delay: .65s; }
+  .sc.active .steps i:nth-child(4) { animation-delay: 1.35s; }
+  @keyframes pop { from { opacity: 0; transform: scale(.3); } to { opacity: 1; transform: none; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .meter { width: 74%; height: 10px; overflow: hidden; background: #06241d; border: 2px solid #1f9c78; border-radius: 3px; }
+  .meter span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #3ddc97, #b6ff6a); }
+  .sc.active .meter span { animation: meterFill 2.6s .3s ease-out forwards; }
+  @keyframes meterFill { to { width: 100%; } }
+
+  /* scene 4: follow */
+  .ring { position: relative; width: 58px; height: 58px; }
+  .ring::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(#f9ce34, #ee2a7b, #6228d7, #f9ce34); animation: spin 3s linear infinite; }
+  .ring span { position: absolute; inset: 3px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #0a0720; font-size: 24px; }
+  .sc.active .ring { animation: pop .5s cubic-bezier(.2, 1.5, .4, 1) both; }
+  .handle { font-family: var(--pixel); font-size: 12px; background: linear-gradient(90deg, #ffd84a, #ff5fa2, #b69cff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sc.active .handle { animation: slideUp .5s .3s both; }
+  .s4 .sub { opacity: 0; }
+  .sc.active.s4 .sub { animation: slideUp .5s .6s both; }
+  .follow { padding: 8px 12px; font-family: var(--pixel); font-size: 8px; color: #fff; text-decoration: none; border-radius: 20px; background: linear-gradient(90deg, #833ab4, #e1306c); box-shadow: 0 0 14px rgba(225, 48, 108, .6); opacity: 0; }
+  .sc.active .follow { animation: slideUp .5s .9s both, followPulse 1.2s 1.5s ease-in-out infinite; }
+  @keyframes followPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+  .heart { position: absolute; bottom: 8px; left: 50%; color: #ff4d8d; font-size: 16px; opacity: 0; }
+  .sc.active .heart { animation: rise 2.4s ease-in infinite; animation-delay: var(--d); }
+  @keyframes rise { 0% { opacity: 0; transform: translate(var(--x), 0) scale(.6); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(calc(var(--x) * 1.6), -130px) scale(1.3); } }
+
+  #paneLoading .rune { width: 38px; height: 38px; }
+  #paneLoading .rune i { border-width: 3px; }
+  #paneLoading .rune i:nth-child(2) { inset: 7px; }
+  #paneLoading .rune i:nth-child(3) { inset: 14px; box-shadow: 0 0 12px 3px rgba(244, 217, 138, .7); }
+  #paneLoading h2 { font-size: 11px; margin: 10px 0 6px; }
+  #paneLoading .hp { margin: 10px 0 8px; }
+  #paneLoading .btn { margin-top: 10px; }
+
+  @media (max-height: 700px) { .promo { height: 150px; } .logo { font-size: 16px; } .sword { font-size: 26px; } }
+  @media (max-width: 480px) {
+    h1 { font-size: 18px; }
+    .toasts { right: 50%; transform: translateX(50%); top: 10px; }
+    .castle { height: 26vh; right: 2%; bottom: 10vh; }
+    .moon { width: 60px; height: 60px; }
+  }
+  @media (max-height: 640px) { body { overflow-y: auto; } .stage { align-items: flex-start; } .card { margin: 12px 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition: none !important; }
+    .fly, .shooting { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================ WALLPAPER ============================ -->
+<div class="scene" aria-hidden="true">
+  <div class="sky"></div>
+  <div class="stars" id="stars"></div>
+  <div class="shooting"></div>
+  <div class="moon"></div>
+  <span class="cloud" style="top:16%;--t:75s;--delay:-20s"></span>
+  <span class="cloud" style="top:27%;--t:95s;--delay:-60s;transform:scale(.8)"></span>
+  <span class="cloud" style="top:8%;--t:110s;--delay:-5s;transform:scale(1.2)"></span>
+
+  <div class="layer far">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none">
+      <path fill="#33276f" d="M0,400 L0,250 L110,170 L210,235 L330,110 L460,240 L590,160 L710,250 L850,120 L990,245 L1120,175 L1250,255 L1350,190 L1440,235 L1440,400 Z"/>
+      <path fill="#3b2d80" opacity=".6" d="M330,110 L300,150 L330,140 L360,160 Z M850,120 L820,160 L850,150 L880,170 Z"/>
+    </svg>
+  </div>
+  <div class="layer mid">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none">
+      <path fill="#201653" d="M0,400 L0,270 L90,230 L200,285 L330,200 L470,290 L610,225 L760,300 L900,210 L1050,295 L1190,235 L1320,290 L1440,250 L1440,400 Z"/>
+    </svg>
+  </div>
+
+  <div class="castle">
+    <svg viewBox="0 -40 300 260" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="cren" x="0" y="0" width="20" height="12" patternUnits="userSpaceOnUse"><rect width="10" height="12"/></pattern>
+      </defs>
+      <g fill="#120c2c">
+        <rect x="130" y="30" width="40" height="190"/>
+        <polygon points="124,30 150,-14 176,30"/>
+        <rect x="60" y="90" width="40" height="130"/>
+        <rect x="60" y="78" width="40" height="12" fill="url(#cren)"/>
+        <rect x="100" y="100" width="100" height="120"/>
+        <rect x="100" y="88" width="100" height="12" fill="url(#cren)"/>
+        <rect x="200" y="90" width="40" height="130"/>
+        <rect x="200" y="78" width="40" height="12" fill="url(#cren)"/>
+        <polygon points="54,78 80,40 106,78"/>
+        <polygon points="194,78 220,40 246,78"/>
+        <rect x="149" y="-40" width="2" height="26"/>
+        <path d="M140 220 v-26 a10 10 0 0 1 20 0 v26z" fill="#050312"/>
+      </g>
+      <path class="flag" fill="#e8455d" d="M151,-38 L178,-30 L151,-22 Z"/>
+      <rect class="win" x="146" y="50" width="8" height="13" style="--d:2.1s"/>
+      <rect class="win" x="76" y="108" width="8" height="14" style="--d:2.6s;--delay:.4s"/>
+      <rect class="win" x="216" y="108" width="8" height="14" style="--d:3s;--delay:1s"/>
+      <rect class="win" x="116" y="118" width="8" height="14" style="--d:2.3s;--delay:.2s"/>
+      <rect class="win" x="176" y="118" width="8" height="14" style="--d:2.8s;--delay:.7s"/>
+      <rect class="win" x="146" y="105" width="8" height="14" style="--d:3.2s;--delay:1.3s"/>
+      <rect class="win" x="76" y="150" width="8" height="14" style="--d:2.5s;--delay:.9s"/>
+      <rect class="win" x="216" y="150" width="8" height="14" style="--d:2.2s;--delay:.5s"/>
+      <circle class="win" cx="150" cy="208" r="3" style="--d:1.2s"/>
+    </svg>
+  </div>
+
+  <div class="layer near">
+    <svg viewBox="0 0 1440 300" preserveAspectRatio="none">
+      <path fill="#120d33" d="M0,300 L0,150 Q180,70 400,140 T820,130 T1180,120 T1440,140 L1440,300 Z"/>
+    </svg>
+  </div>
+  <div class="trees-wrap">
+    <svg viewBox="0 0 1440 200" preserveAspectRatio="none"><g id="trees" fill="#070518"></g>
+      <rect y="170" width="1440" height="30" fill="#070518"/></svg>
+  </div>
+  <div class="fireflies" id="fireflies"></div>
+</div>
+
+<!-- ============================ MAIN CARD ============================ -->
+<main class="stage">
+  <section class="card">
+    <i class="gem tl"></i><i class="gem tr"></i><i class="gem bl"></i><i class="gem br"></i>
+    <h1>EasySave</h1>
+    <p class="by">Created by @nihaleee_y</p>
+    <p id="deviceInfo" class="device"></p>
+
+    <div class="field">
+      <label for="urlInput">&#9654; SCROLL OF LINK</label>
+      <input type="text" id="urlInput" placeholder="Paste YouTube / Instagram / Spotify link..." autocomplete="off" inputmode="url">
+    </div>
+
+    <div class="badge" id="spotBadge">
+      &#127911; <b>Spotify link detected.</b> Tracks, playlists and albums work. Spotify itself is copy-protected, so EasySave finds each song on YouTube and saves it as an MP3 with the title and artist filled in.
+    </div>
+
+    <div class="field">
+      <label for="typeInput">&#9654; CHOOSE LOOT</label>
+      <select id="typeInput">
+        <option value="video">Video (MP4)</option>
+        <option value="audio">Audio Only (MP3)</option>
+      </select>
+    </div>
+
+    <div class="field quality" id="qualityBox">
+      <label>&#9654; MP3 QUALITY</label>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="q" value="128"><span>128k</span></label>
+        <label class="chip"><input type="radio" name="q" value="192"><span>192k</span></label>
+        <label class="chip"><input type="radio" name="q" value="256"><span>256k</span></label>
+        <label class="chip"><input type="radio" name="q" value="320" checked><span>320k</span></label>
+      </div>
+    </div>
+
+    <button class="btn" id="downloadBtn" type="button">&#9876; START DOWNLOAD</button>
+    <a class="ig" href="https://instagram.com/nihaleee_y" target="_blank" rel="noopener noreferrer">&#128248; Follow <b>@nihaleee_y</b> on Instagram</a>
+    <p class="foot">For personal use. Respect creators' rights.</p>
+  </section>
+</main>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<!-- ============================ POPUP ============================ -->
+<div class="overlay" id="overlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="pane" id="paneLoading">
+      <div class="promo" aria-label="EasySave promo video">
+        <div class="seg"><b><i></i></b><b><i></i></b><b><i></i></b><b><i></i></b></div>
+        <span class="tag">PROMO</span>
+
+        <div class="sc s1">
+          <div class="big t1">SLOW DOWNLOADS?</div>
+          <div class="track"><span class="snail">&#128012;</span></div>
+          <div class="big t2">&#9889; NOT ANYMORE! &#9889;</div>
+          <div class="flash"></div>
+        </div>
+
+        <div class="sc s2">
+          <div class="sword">&#9876;&#65039;</div>
+          <div class="logo">EASYSAVE</div>
+          <div class="pills"><span>YouTube</span><span>Instagram</span><span>Spotify</span></div>
+          <div class="sub">Save as MP4 or MP3 up to 320k</div>
+        </div>
+
+        <div class="sc s3">
+          <div class="big">3 STEPS. DONE.</div>
+          <div class="steps">
+            <div class="st"><em>&#128203;</em>PASTE</div><i>&#9654;</i>
+            <div class="st"><em>&#9876;&#65039;</em>CLICK</div><i>&#9654;</i>
+            <div class="st"><em>&#128190;</em>SAVED</div>
+          </div>
+          <div class="meter"><span></span></div>
+        </div>
+
+        <div class="sc s4">
+          <div class="ring"><span>&#128248;</span></div>
+          <div class="handle">@nihaleee_y</div>
+          <div class="sub">Follow for more cool tools</div>
+          <a class="follow" href="https://instagram.com/nihaleee_y" target="_blank" rel="noopener noreferrer">FOLLOW ON INSTAGRAM</a>
+          <span class="heart" style="--x:-50px;--d:0s">&#9829;</span>
+          <span class="heart" style="--x:30px;--d:.7s">&#9829;</span>
+          <span class="heart" style="--x:-10px;--d:1.4s">&#9829;</span>
+          <span class="heart" style="--x:60px;--d:1.9s">&#9829;</span>
+        </div>
+      </div>
+      <div class="rune"><i></i><i></i><i></i></div>
+      <h2>Loading file...<br>please wait</h2>
+      <div class="hp"></div>
+      <p class="tip" id="tip"></p>
+      <button class="btn ghost" id="cancelBtn" type="button">CANCEL</button>
+    </div>
+
+    <div class="pane" id="paneSuccess">
+      <div class="check">
+        <svg viewBox="0 0 84 84"><circle cx="42" cy="42" r="37"/><path d="M26 43 l11 11 l22 -24"/></svg>
+        <span class="spark" style="--x:-60px;--y:-50px"></span><span class="spark" style="--x:62px;--y:-46px"></span>
+        <span class="spark" style="--x:-66px;--y:20px"></span><span class="spark" style="--x:64px;--y:30px"></span>
+        <span class="spark" style="--x:-10px;--y:-70px"></span><span class="spark" style="--x:6px;--y:70px"></span>
+      </div>
+      <h2>Download started!</h2>
+      <p>Check your browser's downloads. Your file is on its way.</p>
+      <p class="ig-line">Enjoying EasySave? Follow <a href="https://instagram.com/nihaleee_y" target="_blank" rel="noopener noreferrer">@nihaleee_y</a></p>
+      <button class="btn" id="okBtn" type="button">AWESOME</button>
+    </div>
+
+    <div class="pane" id="paneList">
+      <h2 class="list-head" id="listName" style="margin:0 0 4px"></h2>
+      <p class="list-sub" id="listSub"></p>
+      <ul class="tracks" id="tracks"></ul>
+      <div class="row-btns">
+        <button class="btn" id="allBtn" type="button">DOWNLOAD ALL</button>
+        <button class="btn ghost" id="listClose" type="button">CLOSE</button>
+      </div>
+      <p class="tip" id="listTip" style="margin-top:8px"></p>
+    </div>
+
+    <div class="pane" id="paneError">
+      <div class="cross">&#10006;</div>
+      <h2>Quest failed</h2>
+      <p class="errmsg" id="errMsg"></p>
+      <button class="btn danger" id="errBtn" type="button">TRY AGAIN</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const urlInput = $('urlInput'), typeInput = $('typeInput'), btn = $('downloadBtn');
+const overlay = $('overlay'), qualityBox = $('qualityBox'), spotBadge = $('spotBadge');
+
+/* ---------- device ---------- */
+(function detectDevice() {
+  const ua = navigator.userAgent;
+  let device = 'Desktop PC';
+  if (/android/i.test(ua)) device = 'Android Mobile';
+  else if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) device = 'iOS Device';
+  else if (/tablet/i.test(ua)) device = 'Tablet';
+  $('deviceInfo').textContent = 'Connected from: ' + device;
+})();
+
+/* ---------- wallpaper generation ---------- */
+(function buildScene() {
+  const stars = $('stars');
+  for (let i = 0; i < 90; i++) {
+    const s = document.createElement('span');
+    s.className = 'star';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.setProperty('--d', (2 + Math.random() * 4).toFixed(1) + 's');
+    s.style.setProperty('--delay', (-Math.random() * 5).toFixed(1) + 's');
+    if (Math.random() < .15) { s.style.width = s.style.height = '3px'; }
+    stars.appendChild(s);
+  }
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const trees = $('trees');
+  for (let x = -10; x < 1450; x += 22 + Math.random() * 14) {
+    const h = 60 + Math.random() * 110, w = 26 + Math.random() * 18;
+    const base = 180, top = base - h;
+    const p = document.createElementNS(NS, 'polygon');
+    p.setAttribute('points',
+      `${x},${base} ${x + w * .12},${top + h * .55} ${x + w * .3},${top + h * .55} ${x + w * .2},${top + h * .3} ` +
+      `${x + w * .38},${top + h * .3} ${x + w / 2},${top} ${x + w * .62},${top + h * .3} ${x + w * .8},${top + h * .3} ` +
+      `${x + w * .7},${top + h * .55} ${x + w * .88},${top + h * .55} ${x + w},${base}`);
+    trees.appendChild(p);
+  }
+
+  const flies = $('fireflies');
+  for (let i = 0; i < 28; i++) {
+    const f = document.createElement('span');
+    f.className = 'fly';
+    f.style.left = Math.random() * 100 + '%';
+    f.style.bottom = (4 + Math.random() * 22) + 'vh';
+    f.style.setProperty('--dx', (Math.random() * 120 - 60).toFixed(0) + 'px');
+    f.style.setProperty('--dur', (9 + Math.random() * 10).toFixed(1) + 's');
+    f.style.setProperty('--delay', (-Math.random() * 14).toFixed(1) + 's');
+    flies.appendChild(f);
+  }
+
+  // gentle parallax on mouse / touch move
+  const root = document.documentElement;
+  function move(x, y) {
+    root.style.setProperty('--mx', ((x / innerWidth) - .5).toFixed(3));
+    root.style.setProperty('--my', ((y / innerHeight) - .5).toFixed(3));
+  }
+  addEventListener('mousemove', e => move(e.clientX, e.clientY), { passive: true });
+  addEventListener('touchmove', e => { const t = e.touches[0]; if (t) move(t.clientX, t.clientY); }, { passive: true });
+})();
+
+/* ---------- toasts ---------- */
+function toast(msg, type = 'info', ms = 3600) {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  $('toasts').appendChild(t);
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 380); }, ms);
+}
+
+/* ---------- popup ---------- */
+const panes = { loading: $('paneLoading'), success: $('paneSuccess'), error: $('paneError'), list: $('paneList') };
+function showPane(name) {
+  overlay.classList.add('show');
+  Object.entries(panes).forEach(([k, el]) => {
+    el.classList.remove('show');
+    if (k === name) { void el.offsetWidth; el.classList.add('show'); }
+  });
+}
+function closePopup() { overlay.classList.remove('show'); }
+
+const TIPS = [
+  'Summoning your file...', 'Sharpening ffmpeg blades...', 'Convincing the servers to cooperate...',
+  'Polishing the audio crystals...', 'Crossing the forest of bytes...', 'Almost there, brave adventurer...'
+];
+let tipTimer = null, current = null, lookup = null, busy = false;
+let listData = null, allRunning = false, allStop = false;
+
+function startTips() {
+  clearInterval(tipTimer);
+  let i = 0; $('tip').textContent = TIPS[0];
+  tipTimer = setInterval(() => { i = (i + 1) % TIPS.length; $('tip').textContent = TIPS[i]; }, 2200);
+}
+
+/* promo video: 4 scenes, story-style progress bars */
+const scenes = Array.from(document.querySelectorAll('.sc'));
+const segs = Array.from(document.querySelectorAll('.seg i'));
+let promoTimer = null, promoIdx = 0;
+function showScene(i) {
+  scenes.forEach((s, k) => s.classList.toggle('active', k === i));
+  segs.forEach((s, k) => { s.className = k < i ? 'done' : (k === i ? 'run' : ''); });
+}
+function startPromo() {
+  clearInterval(promoTimer);
+  promoIdx = 0; showScene(0);
+  promoTimer = setInterval(() => { promoIdx = (promoIdx + 1) % scenes.length; showScene(promoIdx); }, 3600);
+}
+function stopPromo() { clearInterval(promoTimer); promoTimer = null; }
+
+function beginLoading() { showPane('loading'); startTips(); startPromo(); }
+function endLoading() { clearInterval(tipTimer); tipTimer = null; stopPromo(); busy = false; btn.disabled = false; }
+
+/* ---------- link detection ---------- */
+function isSpotify(v) { return /^https?:\/\/(open\.spotify\.com|spotify\.link)\//i.test(v.trim()); }
+function refreshUi() {
+  const sp = isSpotify(urlInput.value);
+  spotBadge.classList.toggle('show', sp);
+  typeInput.querySelector('option[value="video"]').disabled = sp;
+  if (sp) typeInput.value = 'audio';
+  qualityBox.classList.toggle('show', typeInput.value === 'audio');
+}
+urlInput.addEventListener('input', refreshUi);
+typeInput.addEventListener('change', refreshUi);
+urlInput.addEventListener('paste', () => setTimeout(refreshUi, 0));
+refreshUi();
+
+/* ---------- one download = hidden iframe + "started" cookie from the server ---------- */
+function cookieHas(token) { return document.cookie.split('; ').indexOf('dl_token=' + token) !== -1; }
+
+function readFrameError(fr) {
+  try {
+    const doc = fr && fr.contentDocument;
+    if (!doc || !doc.body) return null;
+    const txt = (doc.body.innerText || '').trim();
+    if (!txt) return null;
+    try { return JSON.parse(txt).error || txt; } catch (e) { return txt.slice(0, 400); }
+  } catch (e) { return null; }
+}
+
+function runDownload(params) {
+  let end;
+  const promise = new Promise(resolve => {
+    const token = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    const fr = document.createElement('iframe');
+    fr.style.display = 'none';
+    fr.src = '/download?' + new URLSearchParams(Object.assign({}, params, { token: token })).toString();
+    document.body.appendChild(fr);
+    const t0 = Date.now();
+    let done = false;
+    const timer = setInterval(() => {
+      if (cookieHas(token)) return end({ ok: true }, true);
+      const e = readFrameError(fr);
+      if (e) return end({ ok: false, error: e });
+      if (Date.now() - t0 > 180000) end({ ok: false, error: 'This is taking too long. Try again, or try a shorter video.' });
+    }, 400);
+    end = function (result, keepFrame) {
+      if (done) return;
+      done = true;
+      clearInterval(timer);
+      document.cookie = 'dl_token=; Max-Age=0; path=/';
+      // keep the frame after a successful start so the browser can finish the download
+      if (keepFrame) setTimeout(() => fr.remove(), 30 * 60 * 1000); else fr.remove();
+      resolve(result);
+    };
+  });
+  promise.cancel = () => end({ ok: false, cancelled: true });
+  return promise;
+}
+
+function afterPopup() { if (listData) showPane('list'); else closePopup(); }
+
+function showFail(message) {
+  endLoading();
+  $('errMsg').textContent = message;
+  showPane('error');
+}
+
+async function downloadOne(params) {
+  current = runDownload(params);
+  const r = await current;
+  current = null;
+  if (r.cancelled) return;
+  if (r.ok) { endLoading(); showPane('success'); toast('Download started!', 'success'); }
+  else showFail(r.error);
+}
+
+function selectedQuality() { return (document.querySelector('input[name=q]:checked') || {}).value || '320'; }
+
+function trackParams(t) {
+  const p = { type: 'audio', quality: selectedQuality(), sp_title: t.title, sp_artist: t.artist || '' };
+  if (t.duration) p.sp_dur = String(t.duration);
+  return p;
+}
+
+async function startDownload() {
+  if (busy) return;
+  const url = urlInput.value.trim();
+  if (!url) { toast('Please enter a link!', 'error'); urlInput.focus(); return; }
+  if (!/^https?:\/\//i.test(url)) { toast('That does not look like a valid link.', 'error'); return; }
+
+  busy = true; btn.disabled = true; listData = null;
+  beginLoading();
+
+  if (!isSpotify(url)) {
+    return downloadOne({ url: url, type: typeInput.value, quality: selectedQuality() });
+  }
+
+  // Spotify: read the link first (track, playlist or album)
+  lookup = new AbortController();
+  let info;
+  try {
+    const resp = await fetch('/spotify/info?url=' + encodeURIComponent(url), { signal: lookup.signal });
+    info = await resp.json();
+    if (!resp.ok) throw new Error(info.error || 'Could not read that Spotify link.');
+  } catch (e) {
+    lookup = null;
+    if (e.name === 'AbortError') return;
+    return showFail(e.message || 'Could not read that Spotify link.');
+  }
+  lookup = null;
+
+  if (info.type === 'track') return downloadOne(trackParams(info.tracks[0]));
+  endLoading();
+  openList(info);
+}
+
+/* ---------- Spotify playlist / album list ---------- */
+const rows = [];
+function openList(info) {
+  listData = info;
+  $('listName').textContent = info.name;
+  const n = info.tracks.length;
+  $('listSub').textContent = (info.type === 'album' ? 'Album' : 'Playlist') + ' • ' + n + ' song' + (n === 1 ? '' : 's');
+  $('listTip').textContent = 'Tap ⬇ for one song, or Download All. Your browser may ask to allow multiple downloads. Tap Allow.';
+  const ul = $('tracks'); ul.innerHTML = ''; rows.length = 0;
+  info.tracks.forEach((t, i) => {
+    const li = document.createElement('li');
+    const num = document.createElement('span'); num.className = 'n'; num.textContent = String(i + 1);
+    const meta = document.createElement('div'); meta.className = 'meta';
+    const b = document.createElement('b'); b.textContent = t.title;
+    const s = document.createElement('span'); s.textContent = t.artist || '';
+    meta.append(b, s);
+    const ic = document.createElement('span'); ic.className = 'st-ic';
+    const go = document.createElement('button'); go.type = 'button'; go.className = 'go'; go.textContent = '⬇';
+    go.title = 'Download this song';
+    go.addEventListener('click', () => downloadFromList(i));
+    li.append(num, meta, ic, go);
+    ul.appendChild(li);
+    rows.push({ li: li, ic: ic, go: go });
+  });
+  setRowsDisabled(false);
+  $('allBtn').textContent = 'DOWNLOAD ALL';
+  showPane('list');
+}
+
+function setRowsDisabled(v) { rows.forEach(r => { r.go.disabled = v; }); }
+function mark(i, cls, ch) { rows[i].ic.className = 'st-ic ' + cls; rows[i].ic.textContent = ch; }
+
+function downloadFromList(i) {
+  if (busy) return;
+  busy = true; btn.disabled = true;
+  beginLoading();
+  downloadOne(trackParams(listData.tracks[i])).then(() => { if (rows[i] && !busy) mark(i, 'ok', '✓'); });
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function downloadAll() {
+  if (allRunning) { allStop = true; if (current) current.cancel(); return; }
+  if (busy || !listData) return;
+  busy = true; btn.disabled = true; allRunning = true; allStop = false;
+  setRowsDisabled(true);
+  $('allBtn').textContent = 'STOP';
+  let started = 0, failed = 0, lastError = '';
+  for (let i = 0; i < listData.tracks.length; i++) {
+    if (allStop) break;
+    rows[i].li.classList.add('running');
+    rows[i].li.scrollIntoView({ block: 'nearest' });
+    $('listTip').textContent = 'Starting ' + (i + 1) + ' of ' + listData.tracks.length + '...';
+    current = runDownload(trackParams(listData.tracks[i]));
+    const r = await current;
+    current = null;
+    rows[i].li.classList.remove('running');
+    if (r.cancelled) break;
+    if (r.ok) { started++; mark(i, 'ok', '✓'); await sleep(2500); }
+    else {
+      failed++; lastError = r.error; mark(i, 'bad', '✗');
+      if (/not a bot|cookies/i.test(r.error)) break;       // every next one would fail the same way
+    }
+  }
+  allRunning = false; busy = false; btn.disabled = false;
+  setRowsDisabled(false);
+  $('allBtn').textContent = 'DOWNLOAD ALL';
+  $('listTip').textContent = 'Started ' + started + (started === 1 ? ' download' : ' downloads') +
+    (failed ? ', ' + failed + ' failed. ' + lastError.slice(0, 160) : '.');
+}
+
+function closeEverything() {
+  allStop = true; if (current) current.cancel();
+  listData = null; closePopup();
+}
+
+btn.addEventListener('click', startDownload);
+urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') startDownload(); });
+$('allBtn').addEventListener('click', downloadAll);
+$('listClose').addEventListener('click', closeEverything);
+$('cancelBtn').addEventListener('click', () => {
+  if (current) current.cancel();
+  if (lookup) lookup.abort();
+  endLoading();
+  afterPopup();
+  toast('Download cancelled.', 'info');
+});
+$('okBtn').addEventListener('click', afterPopup);
+$('errBtn').addEventListener('click', afterPopup);
+overlay.addEventListener('click', e => { if (e.target === overlay && !busy) closeEverything(); });
+</script>
+</body>
+</html>
