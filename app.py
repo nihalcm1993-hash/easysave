@@ -4,6 +4,7 @@ import os
 import re
 import shutil
 import subprocess
+import tempfile
 import urllib.request
 from urllib.parse import urlparse, quote
 
@@ -31,6 +32,16 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 COOKIES_FILE = os.environ.get('EASYSAVE_COOKIES') or os.path.join(HERE, 'cookies.txt')
 COOKIES_BROWSER = os.environ.get('EASYSAVE_BROWSER', '').strip().lower()
 
+# Render secret files are read-only, but yt-dlp wants to write refreshed cookies back.
+# So we copy the file to a writable temp location once at startup.
+COOKIES_TMP = None
+if os.path.isfile(COOKIES_FILE):
+    try:
+        COOKIES_TMP = os.path.join(tempfile.gettempdir(), 'easysave_cookies.txt')
+        shutil.copyfile(COOKIES_FILE, COOKIES_TMP)
+    except OSError:
+        COOKIES_TMP = None
+
 BOT_HELP = ("YouTube is asking this server to prove it's not a bot. Fix on the PC that runs EasySave: "
             "(1) update the downloader: pip install -U \"yt-dlp[default]\" and make sure Node.js or Deno "
             "is installed, then restart. (2) If it still happens, save your YouTube cookies as cookies.txt "
@@ -46,8 +57,8 @@ def base_opts():
             runtimes[name] = {}
     if runtimes:
         opts['js_runtimes'] = runtimes
-    if os.path.isfile(COOKIES_FILE):
-        opts['cookiefile'] = COOKIES_FILE
+    if COOKIES_TMP:
+        opts['cookiefile'] = COOKIES_TMP
     elif COOKIES_BROWSER:
         opts['cookiesfrombrowser'] = (COOKIES_BROWSER,)
     return opts
