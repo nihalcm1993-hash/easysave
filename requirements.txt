@@ -1,3 +1,11 @@
-﻿flask
-yt-dlp
+flask
+yt-dlp[default]
 gunicorn
+```[cite: 1]
+
+이 ഫയൽ സേവ് ചെയ്ത ശേഷം താഴെയുള്ള കമാൻഡുകൾ ഉപയോഗിച്ച് ഗിറ്റിലേക്ക് പുഷ് ചെയ്യുക:
+
+```bash
+git add requirements.txt
+git commit -m "Update requirements with yt-dlp default"
+git push origin main
