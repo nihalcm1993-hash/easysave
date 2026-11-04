@@ -149,7 +149,10 @@
   .by { margin: 0; font-size: 12px; color: #a9a2d6; }
   .device { margin: 4px 0 12px; font-size: 12px; color: var(--green); font-weight: 600; }
 
-  .device { margin-bottom: 18px; }
+  .xp { margin: 0 auto 16px; width: 100%; text-align: left; }
+  .xp-top { display: flex; justify-content: space-between; font-family: var(--pixel); font-size: 8px; color: var(--gold); margin-bottom: 6px; }
+  .xp-bar { height: 10px; background: #0a0720; border: 2px solid var(--gold-dark); border-radius: 3px; overflow: hidden; }
+  .xp-fill { height: 100%; width: 0; background: linear-gradient(90deg, #3ddc97, #b6ff6a); box-shadow: 0 0 10px #3ddc97; transition: width .8s ease; }
 
   label { display: block; text-align: left; font-family: var(--pixel); font-size: 9px; color: var(--gold); margin: 0 0 8px; }
   .field { margin-bottom: 16px; }
@@ -219,7 +222,7 @@
   .overlay.show { display: flex; animation: fade .25s ease both; }
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
   .modal {
-    width: min(94vw, 400px); max-height: 94vh; overflow-y: auto; padding: 22px 20px 18px; text-align: center; border-radius: 6px;
+    width: min(92vw, 380px); padding: 26px 22px 20px; text-align: center; border-radius: 6px;
     background: linear-gradient(160deg, var(--panel-2), var(--panel)); border: 4px solid var(--gold);
     box-shadow: 0 0 0 4px var(--ink), 0 0 0 7px var(--gold-dark), 0 30px 70px rgba(0, 0, 0, .7);
     animation: modalPop .45s cubic-bezier(.2, 1.4, .4, 1) both;
@@ -262,133 +265,10 @@
 
   .cross { width: 84px; height: 84px; margin: 0 auto; font-size: 54px; line-height: 84px; color: var(--red); animation: shake .5s ease; text-shadow: 0 0 20px rgba(255, 93, 115, .7); }
   @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-9px); } 40%, 80% { transform: translateX(9px); } }
-  .errmsg { max-height: 220px; overflow: auto; padding: 8px 10px; background: rgba(255, 93, 115, .1); border: 1px solid rgba(255, 93, 115, .45); border-radius: 4px; font-size: 13px; text-align: left; word-break: break-word; }
+  .errmsg { max-height: 120px; overflow: auto; padding: 8px 10px; background: rgba(255, 93, 115, .1); border: 1px solid rgba(255, 93, 115, .45); border-radius: 4px; font-size: 13px; text-align: left; word-break: break-word; }
 
-  /* ---- Spotify playlist / album list ---- */
-  .list-head { margin: 0 0 4px; font-family: var(--pixel); font-size: 11px; line-height: 1.5; color: var(--gold); word-break: break-word; }
-  .list-sub { margin: 0 0 10px; font-size: 12px; color: #a9a2d6; }
-  .tracks { max-height: 38vh; overflow-y: auto; margin: 0 0 4px; padding: 0; list-style: none; text-align: left; border: 2px solid var(--gold-dark); border-radius: 4px; background: #0a0720; }
-  .tracks li { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid rgba(255, 255, 255, .07); font-size: 13px; }
-  .tracks li:last-child { border-bottom: 0; }
-  .tracks .n { flex: 0 0 auto; width: 22px; color: #7f78b3; font-size: 11px; text-align: right; }
-  .tracks .meta { flex: 1; min-width: 0; }
-  .tracks .meta b, .tracks .meta span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .tracks .meta span { font-size: 11px; color: #a9a2d6; }
-  .tracks .st-ic { flex: 0 0 auto; width: 20px; text-align: center; font-size: 14px; }
-  .tracks .st-ic.ok { color: var(--green); } .tracks .st-ic.bad { color: var(--red); }
-  .tracks .go { flex: 0 0 auto; padding: 5px 9px; font-size: 14px; line-height: 1; cursor: pointer; color: var(--gold); background: transparent; border: 2px solid var(--gold-dark); border-radius: 4px; }
-  .tracks .go:hover:not(:disabled) { background: rgba(244, 217, 138, .15); }
-  .tracks .go:disabled { opacity: .4; cursor: not-allowed; }
-  .tracks li.running { background: rgba(61, 220, 151, .1); }
-  .row-btns { display: flex; gap: 8px; }
-  .row-btns .btn { margin-top: 12px; }
+  .levelup { font-family: var(--pixel); font-size: 10px; color: #ffe27a; margin-top: 8px; animation: titleGlow 1s ease-in-out infinite alternate; }
 
-  /* ============================ INSTAGRAM BANNER ============================ */
-  .ig {
-    display: block; margin: 14px 0 0; padding: 11px 12px; border-radius: 4px; text-decoration: none; color: #fff; font-size: 13px;
-    background: linear-gradient(90deg, #833ab4, #c13584, #e1306c, #c13584, #833ab4); background-size: 300% 100%;
-    animation: igMove 6s linear infinite; box-shadow: 0 0 16px rgba(225, 48, 108, .35); transition: transform .15s;
-  }
-  .ig:hover { transform: translateY(-2px); }
-  .ig b { font-weight: 800; }
-  @keyframes igMove { to { background-position: 300% 0; } }
-  .ig-line { font-size: 13px; color: #cfc8ff; }
-  .ig-line a { color: var(--gold); font-weight: 700; }
-
-  /* ============================ PROMO VIDEO (inside loading popup) ============================ */
-  .promo { position: relative; height: 190px; margin: 0 0 12px; overflow: hidden; border-radius: 4px; border: 2px solid var(--gold-dark); background: #0a0720; }
-  .promo::after { content: ''; position: absolute; inset: 0; z-index: 4; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .13) 0 1px, transparent 1px 3px); }
-  .tag { position: absolute; z-index: 5; bottom: 6px; right: 8px; font-family: var(--pixel); font-size: 6px; padding: 3px 5px; color: var(--gold); background: rgba(0, 0, 0, .55); border-radius: 2px; }
-  .seg { position: absolute; z-index: 5; top: 7px; left: 8px; right: 8px; display: flex; gap: 4px; }
-  .seg b { flex: 1; height: 3px; overflow: hidden; border-radius: 2px; background: rgba(255, 255, 255, .25); }
-  .seg i { display: block; height: 100%; width: 0; background: #fff; }
-  .seg i.done { width: 100%; }
-  .seg i.run { animation: segFill 3.6s linear forwards; }
-  @keyframes segFill { to { width: 100%; } }
-
-  .sc { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px; padding: 22px 12px 10px; opacity: 0; visibility: hidden; transition: opacity .3s; }
-  .sc.active { opacity: 1; visibility: visible; }
-  .s1 { background: radial-gradient(circle at 50% 130%, #6a1b45, #150c33 70%); }
-  .s2 { background: radial-gradient(circle at 50% 40%, #3b2a8a, #0d0a28 75%); }
-  .s3 { background: radial-gradient(circle at 50% 120%, #0d5a49, #0d0a28 72%); }
-  .s4 { background: radial-gradient(circle at 50% 100%, #7a1f5c, #160a33 72%); }
-  .big { font-family: var(--pixel); font-size: 12px; line-height: 1.5; color: var(--gold); text-shadow: 2px 2px 0 #3b2506; }
-  .sub { font-size: 12px; color: #d9d4ff; }
-
-  /* scene 1: hook */
-  .sc.active .t1 { animation: slam .45s both; }
-  .track { position: relative; width: 78%; height: 34px; border-bottom: 2px dashed #6b5aa8; }
-  .snail { position: absolute; bottom: 0; left: 0; font-size: 26px; }
-  .sc.active .snail { animation: crawl 1.9s ease-in forwards, zoomOff .6s 1.9s ease-in forwards; }
-  @keyframes crawl { to { left: calc(100% - 30px); } }
-  @keyframes zoomOff { from { left: calc(100% - 30px); opacity: 1; } to { left: 150%; opacity: 0; } }
-  .t2 { opacity: 0; color: #fff; text-shadow: 0 0 14px #ffd84a, 2px 2px 0 #7a4a00; }
-  .sc.active .t2 { animation: slam .5s 1.9s both; }
-  @keyframes slam { from { opacity: 0; transform: scale(2.4); } to { opacity: 1; transform: none; } }
-  .flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
-  .sc.active .flash { animation: flashAnim .5s 1.9s ease-out; }
-  @keyframes flashAnim { 0% { opacity: 0; } 20% { opacity: .85; } 100% { opacity: 0; } }
-
-  /* scene 2: logo */
-  .sword { font-size: 34px; }
-  .sc.active .sword { animation: spinIn .7s cubic-bezier(.2, 1.3, .4, 1) both; }
-  @keyframes spinIn { from { opacity: 0; transform: rotate(-360deg) scale(0); } to { opacity: 1; transform: none; } }
-  .logo { font-family: var(--pixel); font-size: 20px; color: var(--gold); text-shadow: 3px 3px 0 #5a3b0c, 0 0 20px rgba(244, 217, 138, .8); }
-  .sc.active .logo { animation: slam .5s .35s both; }
-  .pills { display: flex; gap: 6px; }
-  .pills span { padding: 4px 8px; font-size: 11px; font-weight: 700; color: #fff; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .35); border-radius: 20px; opacity: 0; }
-  .sc.active .pills span { animation: slideUp .45s both; }
-  .sc.active .pills span:nth-child(1) { animation-delay: 1s; }
-  .sc.active .pills span:nth-child(2) { animation-delay: 1.2s; }
-  .sc.active .pills span:nth-child(3) { animation-delay: 1.4s; }
-  .s2 .sub { opacity: 0; }
-  .sc.active.s2 .sub { animation: slideUp .5s 1.8s both; }
-  @keyframes slideUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-
-  /* scene 3: steps */
-  .steps { display: flex; align-items: center; gap: 8px; }
-  .steps i { font-style: normal; font-size: 10px; color: var(--gold); opacity: 0; }
-  .st { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 68px; padding: 9px 6px; font-family: var(--pixel); font-size: 8px; color: #fff; background: rgba(255, 255, 255, .1); border: 2px solid rgba(255, 255, 255, .3); border-radius: 4px; opacity: 0; }
-  .st em { font-style: normal; font-size: 22px; }
-  .sc.active .st { animation: pop .45s cubic-bezier(.2, 1.5, .4, 1) both; }
-  .sc.active .st:nth-child(1) { animation-delay: .2s; }
-  .sc.active .st:nth-child(3) { animation-delay: .9s; }
-  .sc.active .st:nth-child(5) { animation-delay: 1.6s; }
-  .sc.active .steps i { animation: fadeIn .3s both; }
-  .sc.active .steps i:nth-child(2) { animation-delay: .65s; }
-  .sc.active .steps i:nth-child(4) { animation-delay: 1.35s; }
-  @keyframes pop { from { opacity: 0; transform: scale(.3); } to { opacity: 1; transform: none; } }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  .meter { width: 74%; height: 10px; overflow: hidden; background: #06241d; border: 2px solid #1f9c78; border-radius: 3px; }
-  .meter span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #3ddc97, #b6ff6a); }
-  .sc.active .meter span { animation: meterFill 2.6s .3s ease-out forwards; }
-  @keyframes meterFill { to { width: 100%; } }
-
-  /* scene 4: follow */
-  .ring { position: relative; width: 58px; height: 58px; }
-  .ring::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(#f9ce34, #ee2a7b, #6228d7, #f9ce34); animation: spin 3s linear infinite; }
-  .ring span { position: absolute; inset: 3px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #0a0720; font-size: 24px; }
-  .sc.active .ring { animation: pop .5s cubic-bezier(.2, 1.5, .4, 1) both; }
-  .handle { font-family: var(--pixel); font-size: 12px; background: linear-gradient(90deg, #ffd84a, #ff5fa2, #b69cff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .sc.active .handle { animation: slideUp .5s .3s both; }
-  .s4 .sub { opacity: 0; }
-  .sc.active.s4 .sub { animation: slideUp .5s .6s both; }
-  .follow { padding: 8px 12px; font-family: var(--pixel); font-size: 8px; color: #fff; text-decoration: none; border-radius: 20px; background: linear-gradient(90deg, #833ab4, #e1306c); box-shadow: 0 0 14px rgba(225, 48, 108, .6); opacity: 0; }
-  .sc.active .follow { animation: slideUp .5s .9s both, followPulse 1.2s 1.5s ease-in-out infinite; }
-  @keyframes followPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-  .heart { position: absolute; bottom: 8px; left: 50%; color: #ff4d8d; font-size: 16px; opacity: 0; }
-  .sc.active .heart { animation: rise 2.4s ease-in infinite; animation-delay: var(--d); }
-  @keyframes rise { 0% { opacity: 0; transform: translate(var(--x), 0) scale(.6); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(calc(var(--x) * 1.6), -130px) scale(1.3); } }
-
-  #paneLoading .rune { width: 38px; height: 38px; }
-  #paneLoading .rune i { border-width: 3px; }
-  #paneLoading .rune i:nth-child(2) { inset: 7px; }
-  #paneLoading .rune i:nth-child(3) { inset: 14px; box-shadow: 0 0 12px 3px rgba(244, 217, 138, .7); }
-  #paneLoading h2 { font-size: 11px; margin: 10px 0 6px; }
-  #paneLoading .hp { margin: 10px 0 8px; }
-  #paneLoading .btn { margin-top: 10px; }
-
-  @media (max-height: 700px) { .promo { height: 150px; } .logo { font-size: 16px; } .sword { font-size: 26px; } }
   @media (max-width: 480px) {
     h1 { font-size: 18px; }
     .toasts { right: 50%; transform: translateX(50%); top: 10px; }
@@ -478,13 +358,18 @@
     <p class="by">Created by @nihaleee_y</p>
     <p id="deviceInfo" class="device"></p>
 
+    <div class="xp" aria-label="Download level">
+      <div class="xp-top"><span id="lvl">LV 1</span><span id="xpTxt">0 / 100 XP</span></div>
+      <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+    </div>
+
     <div class="field">
       <label for="urlInput">&#9654; SCROLL OF LINK</label>
       <input type="text" id="urlInput" placeholder="Paste YouTube / Instagram / Spotify link..." autocomplete="off" inputmode="url">
     </div>
 
     <div class="badge" id="spotBadge">
-      &#127911; <b>Spotify link detected.</b> Tracks, playlists and albums work. Spotify itself is copy-protected, so EasySave finds each song on YouTube and saves it as an MP3 with the title and artist filled in.
+      &#127911; <b>Spotify track detected.</b> Spotify itself is copy-protected, so EasySave finds the same song on YouTube and saves it as an MP3 with the title and artist filled in.
     </div>
 
     <div class="field">
@@ -506,7 +391,6 @@
     </div>
 
     <button class="btn" id="downloadBtn" type="button">&#9876; START DOWNLOAD</button>
-    <a class="ig" href="https://instagram.com/nihaleee_y" target="_blank" rel="noopener noreferrer">&#128248; Follow <b>@nihaleee_y</b> on Instagram</a>
     <p class="foot">For personal use. Respect creators' rights.</p>
   </section>
 </main>
@@ -517,45 +401,6 @@
 <div class="overlay" id="overlay" role="dialog" aria-modal="true">
   <div class="modal">
     <div class="pane" id="paneLoading">
-      <div class="promo" aria-label="EasySave promo video">
-        <div class="seg"><b><i></i></b><b><i></i></b><b><i></i></b><b><i></i></b></div>
-        <span class="tag">PROMO</span>
-
-        <div class="sc s1">
-          <div class="big t1">SLOW DOWNLOADS?</div>
-          <div class="track"><span class="snail">&#128012;</span></div>
-          <div class="big t2">&#9889; NOT ANYMORE! &#9889;</div>
-          <div class="flash"></div>
-        </div>
-
-        <div class="sc s2">
-          <div class="sword">&#9876;&#65039;</div>
-          <div class="logo">EASYSAVE</div>
-          <div class="pills"><span>YouTube</span><span>Instagram</span><span>Spotify</span></div>
-          <div class="sub">Save as MP4 or MP3 up to 320k</div>
-        </div>
-
-        <div class="sc s3">
-          <div class="big">3 STEPS. DONE.</div>
-          <div class="steps">
-            <div class="st"><em>&#128203;</em>PASTE</div><i>&#9654;</i>
-            <div class="st"><em>&#9876;&#65039;</em>CLICK</div><i>&#9654;</i>
-            <div class="st"><em>&#128190;</em>SAVED</div>
-          </div>
-          <div class="meter"><span></span></div>
-        </div>
-
-        <div class="sc s4">
-          <div class="ring"><span>&#128248;</span></div>
-          <div class="handle">@nihaleee_y</div>
-          <div class="sub">Follow for more cool tools</div>
-          <a class="follow" href="https://instagram.com/nihaleee_y" target="_blank" rel="noopener noreferrer">FOLLOW ON INSTAGRAM</a>
-          <span class="heart" style="--x:-50px;--d:0s">&#9829;</span>
-          <span class="heart" style="--x:30px;--d:.7s">&#9829;</span>
-          <span class="heart" style="--x:-10px;--d:1.4s">&#9829;</span>
-          <span class="heart" style="--x:60px;--d:1.9s">&#9829;</span>
-        </div>
-      </div>
       <div class="rune"><i></i><i></i><i></i></div>
       <h2>Loading file...<br>please wait</h2>
       <div class="hp"></div>
@@ -572,19 +417,8 @@
       </div>
       <h2>Download started!</h2>
       <p>Check your browser's downloads. Your file is on its way.</p>
-      <p class="ig-line">Enjoying EasySave? Follow <a href="https://instagram.com/nihaleee_y" target="_blank" rel="noopener noreferrer">@nihaleee_y</a></p>
+      <div class="levelup" id="levelup" hidden>&#9733; LEVEL UP! &#9733;</div>
       <button class="btn" id="okBtn" type="button">AWESOME</button>
-    </div>
-
-    <div class="pane" id="paneList">
-      <h2 class="list-head" id="listName" style="margin:0 0 4px"></h2>
-      <p class="list-sub" id="listSub"></p>
-      <ul class="tracks" id="tracks"></ul>
-      <div class="row-btns">
-        <button class="btn" id="allBtn" type="button">DOWNLOAD ALL</button>
-        <button class="btn ghost" id="listClose" type="button">CLOSE</button>
-      </div>
-      <p class="tip" id="listTip" style="margin-top:8px"></p>
     </div>
 
     <div class="pane" id="paneError">
@@ -660,6 +494,18 @@ const overlay = $('overlay'), qualityBox = $('qualityBox'), spotBadge = $('spotB
   addEventListener('touchmove', e => { const t = e.touches[0]; if (t) move(t.clientX, t.clientY); }, { passive: true });
 })();
 
+/* ---------- XP / level (just for fun, stored in this browser) ---------- */
+const XP_PER_DL = 20, XP_PER_LVL = 100;
+function loadXp() { try { return parseInt(localStorage.getItem('easysave_xp') || '0', 10) || 0; } catch (e) { return 0; } }
+function saveXp(v) { try { localStorage.setItem('easysave_xp', String(v)); } catch (e) {} }
+function renderXp(xp) {
+  const lvl = Math.floor(xp / XP_PER_LVL) + 1, cur = xp % XP_PER_LVL;
+  $('lvl').textContent = 'LV ' + lvl;
+  $('xpTxt').textContent = cur + ' / ' + XP_PER_LVL + ' XP';
+  $('xpFill').style.width = cur + '%';
+}
+renderXp(loadXp());
+
 /* ---------- toasts ---------- */
 function toast(msg, type = 'info', ms = 3600) {
   const t = document.createElement('div');
@@ -670,7 +516,7 @@ function toast(msg, type = 'info', ms = 3600) {
 }
 
 /* ---------- popup ---------- */
-const panes = { loading: $('paneLoading'), success: $('paneSuccess'), error: $('paneError'), list: $('paneList') };
+const panes = { loading: $('paneLoading'), success: $('paneSuccess'), error: $('paneError') };
 function showPane(name) {
   overlay.classList.add('show');
   Object.entries(panes).forEach(([k, el]) => {
@@ -684,32 +530,19 @@ const TIPS = [
   'Summoning your file...', 'Sharpening ffmpeg blades...', 'Convincing the servers to cooperate...',
   'Polishing the audio crystals...', 'Crossing the forest of bytes...', 'Almost there, brave adventurer...'
 ];
-let tipTimer = null, current = null, lookup = null, busy = false;
-let listData = null, allRunning = false, allStop = false;
+let tipTimer = null, pollTimer = null, frame = null, activeToken = null, startedAt = 0, busy = false;
 
 function startTips() {
-  clearInterval(tipTimer);
   let i = 0; $('tip').textContent = TIPS[0];
   tipTimer = setInterval(() => { i = (i + 1) % TIPS.length; $('tip').textContent = TIPS[i]; }, 2200);
 }
-
-/* promo video: 4 scenes, story-style progress bars */
-const scenes = Array.from(document.querySelectorAll('.sc'));
-const segs = Array.from(document.querySelectorAll('.seg i'));
-let promoTimer = null, promoIdx = 0;
-function showScene(i) {
-  scenes.forEach((s, k) => s.classList.toggle('active', k === i));
-  segs.forEach((s, k) => { s.className = k < i ? 'done' : (k === i ? 'run' : ''); });
+function cleanup() {
+  clearInterval(tipTimer); clearInterval(pollTimer);
+  tipTimer = pollTimer = null;
+  if (frame) { frame.remove(); frame = null; }
+  document.cookie = 'dl_token=; Max-Age=0; path=/';
+  busy = false; btn.disabled = false;
 }
-function startPromo() {
-  clearInterval(promoTimer);
-  promoIdx = 0; showScene(0);
-  promoTimer = setInterval(() => { promoIdx = (promoIdx + 1) % scenes.length; showScene(promoIdx); }, 3600);
-}
-function stopPromo() { clearInterval(promoTimer); promoTimer = null; }
-
-function beginLoading() { showPane('loading'); startTips(); startPromo(); }
-function endLoading() { clearInterval(tipTimer); tipTimer = null; stopPromo(); busy = false; btn.disabled = false; }
 
 /* ---------- link detection ---------- */
 function isSpotify(v) { return /^https?:\/\/(open\.spotify\.com|spotify\.link)\//i.test(v.trim()); }
@@ -725,196 +558,70 @@ typeInput.addEventListener('change', refreshUi);
 urlInput.addEventListener('paste', () => setTimeout(refreshUi, 0));
 refreshUi();
 
-/* ---------- one download = hidden iframe + "started" cookie from the server ---------- */
+/* ---------- download flow ---------- */
 function cookieHas(token) { return document.cookie.split('; ').indexOf('dl_token=' + token) !== -1; }
 
-function readFrameError(fr) {
+function readFrameError() {
   try {
-    const doc = fr && fr.contentDocument;
+    const doc = frame && frame.contentDocument;
     if (!doc || !doc.body) return null;
     const txt = (doc.body.innerText || '').trim();
     if (!txt) return null;
-    try { return JSON.parse(txt).error || txt; } catch (e) { return txt.slice(0, 400); }
+    try { return JSON.parse(txt).error || txt; } catch (e) { return txt.slice(0, 300); }
   } catch (e) { return null; }
 }
 
-function runDownload(params) {
-  let end;
-  const promise = new Promise(resolve => {
-    const token = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-    const fr = document.createElement('iframe');
-    fr.style.display = 'none';
-    fr.src = '/download?' + new URLSearchParams(Object.assign({}, params, { token: token })).toString();
-    document.body.appendChild(fr);
-    const t0 = Date.now();
-    let done = false;
-    const timer = setInterval(() => {
-      if (cookieHas(token)) return end({ ok: true }, true);
-      const e = readFrameError(fr);
-      if (e) return end({ ok: false, error: e });
-      if (Date.now() - t0 > 180000) end({ ok: false, error: 'This is taking too long. Try again, or try a shorter video.' });
-    }, 400);
-    end = function (result, keepFrame) {
-      if (done) return;
-      done = true;
-      clearInterval(timer);
-      document.cookie = 'dl_token=; Max-Age=0; path=/';
-      // keep the frame after a successful start so the browser can finish the download
-      if (keepFrame) setTimeout(() => fr.remove(), 30 * 60 * 1000); else fr.remove();
-      resolve(result);
-    };
-  });
-  promise.cancel = () => end({ ok: false, cancelled: true });
-  return promise;
-}
-
-function afterPopup() { if (listData) showPane('list'); else closePopup(); }
-
-function showFail(message) {
-  endLoading();
+function fail(message) {
+  cleanup();
   $('errMsg').textContent = message;
   showPane('error');
 }
 
-async function downloadOne(params) {
-  current = runDownload(params);
-  const r = await current;
-  current = null;
-  if (r.cancelled) return;
-  if (r.ok) { endLoading(); showPane('success'); toast('Download started!', 'success'); }
-  else showFail(r.error);
+function succeed() {
+  cleanup();
+  const before = Math.floor(loadXp() / XP_PER_LVL);
+  const xp = loadXp() + XP_PER_DL;
+  saveXp(xp); renderXp(xp);
+  $('levelup').hidden = Math.floor(xp / XP_PER_LVL) === before;
+  showPane('success');
+  toast('Download started!', 'success');
 }
 
-function selectedQuality() { return (document.querySelector('input[name=q]:checked') || {}).value || '320'; }
-
-function trackParams(t) {
-  const p = { type: 'audio', quality: selectedQuality(), sp_title: t.title, sp_artist: t.artist || '' };
-  if (t.duration) p.sp_dur = String(t.duration);
-  return p;
-}
-
-async function startDownload() {
+function startDownload() {
   if (busy) return;
   const url = urlInput.value.trim();
   if (!url) { toast('Please enter a link!', 'error'); urlInput.focus(); return; }
   if (!/^https?:\/\//i.test(url)) { toast('That does not look like a valid link.', 'error'); return; }
 
-  busy = true; btn.disabled = true; listData = null;
-  beginLoading();
-
-  if (!isSpotify(url)) {
-    return downloadOne({ url: url, type: typeInput.value, quality: selectedQuality() });
-  }
-
-  // Spotify: read the link first (track, playlist or album)
-  lookup = new AbortController();
-  let info;
-  try {
-    const resp = await fetch('/spotify/info?url=' + encodeURIComponent(url), { signal: lookup.signal });
-    info = await resp.json();
-    if (!resp.ok) throw new Error(info.error || 'Could not read that Spotify link.');
-  } catch (e) {
-    lookup = null;
-    if (e.name === 'AbortError') return;
-    return showFail(e.message || 'Could not read that Spotify link.');
-  }
-  lookup = null;
-
-  if (info.type === 'track') return downloadOne(trackParams(info.tracks[0]));
-  endLoading();
-  openList(info);
-}
-
-/* ---------- Spotify playlist / album list ---------- */
-const rows = [];
-function openList(info) {
-  listData = info;
-  $('listName').textContent = info.name;
-  const n = info.tracks.length;
-  $('listSub').textContent = (info.type === 'album' ? 'Album' : 'Playlist') + ' • ' + n + ' song' + (n === 1 ? '' : 's');
-  $('listTip').textContent = 'Tap ⬇ for one song, or Download All. Your browser may ask to allow multiple downloads. Tap Allow.';
-  const ul = $('tracks'); ul.innerHTML = ''; rows.length = 0;
-  info.tracks.forEach((t, i) => {
-    const li = document.createElement('li');
-    const num = document.createElement('span'); num.className = 'n'; num.textContent = String(i + 1);
-    const meta = document.createElement('div'); meta.className = 'meta';
-    const b = document.createElement('b'); b.textContent = t.title;
-    const s = document.createElement('span'); s.textContent = t.artist || '';
-    meta.append(b, s);
-    const ic = document.createElement('span'); ic.className = 'st-ic';
-    const go = document.createElement('button'); go.type = 'button'; go.className = 'go'; go.textContent = '⬇';
-    go.title = 'Download this song';
-    go.addEventListener('click', () => downloadFromList(i));
-    li.append(num, meta, ic, go);
-    ul.appendChild(li);
-    rows.push({ li: li, ic: ic, go: go });
-  });
-  setRowsDisabled(false);
-  $('allBtn').textContent = 'DOWNLOAD ALL';
-  showPane('list');
-}
-
-function setRowsDisabled(v) { rows.forEach(r => { r.go.disabled = v; }); }
-function mark(i, cls, ch) { rows[i].ic.className = 'st-ic ' + cls; rows[i].ic.textContent = ch; }
-
-function downloadFromList(i) {
-  if (busy) return;
   busy = true; btn.disabled = true;
-  beginLoading();
-  downloadOne(trackParams(listData.tracks[i])).then(() => { if (rows[i] && !busy) mark(i, 'ok', '✓'); });
-}
+  const token = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  activeToken = token; startedAt = Date.now();
+  const q = (document.querySelector('input[name=q]:checked') || {}).value || '320';
+  const params = new URLSearchParams({ url: url, type: typeInput.value, quality: q, token: token });
 
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+  showPane('loading'); startTips();
 
-async function downloadAll() {
-  if (allRunning) { allStop = true; if (current) current.cancel(); return; }
-  if (busy || !listData) return;
-  busy = true; btn.disabled = true; allRunning = true; allStop = false;
-  setRowsDisabled(true);
-  $('allBtn').textContent = 'STOP';
-  let started = 0, failed = 0, lastError = '';
-  for (let i = 0; i < listData.tracks.length; i++) {
-    if (allStop) break;
-    rows[i].li.classList.add('running');
-    rows[i].li.scrollIntoView({ block: 'nearest' });
-    $('listTip').textContent = 'Starting ' + (i + 1) + ' of ' + listData.tracks.length + '...';
-    current = runDownload(trackParams(listData.tracks[i]));
-    const r = await current;
-    current = null;
-    rows[i].li.classList.remove('running');
-    if (r.cancelled) break;
-    if (r.ok) { started++; mark(i, 'ok', '✓'); await sleep(2500); }
-    else {
-      failed++; lastError = r.error; mark(i, 'bad', '✗');
-      if (/not a bot|cookies/i.test(r.error)) break;       // every next one would fail the same way
-    }
-  }
-  allRunning = false; busy = false; btn.disabled = false;
-  setRowsDisabled(false);
-  $('allBtn').textContent = 'DOWNLOAD ALL';
-  $('listTip').textContent = 'Started ' + started + (started === 1 ? ' download' : ' downloads') +
-    (failed ? ', ' + failed + ' failed. ' + lastError.slice(0, 160) : '.');
-}
+  // fresh hidden iframe per download so errors from earlier tries never linger
+  frame = document.createElement('iframe');
+  frame.style.display = 'none';
+  frame.src = '/download?' + params.toString();
+  document.body.appendChild(frame);
 
-function closeEverything() {
-  allStop = true; if (current) current.cancel();
-  listData = null; closePopup();
+  pollTimer = setInterval(() => {
+    if (token !== activeToken) return;
+    if (cookieHas(token)) { succeed(); return; }
+    const e = readFrameError();
+    if (e) { fail(e); return; }
+    if (Date.now() - startedAt > 180000) fail('This is taking too long. Try again, or try a shorter video.');
+  }, 400);
 }
 
 btn.addEventListener('click', startDownload);
 urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') startDownload(); });
-$('allBtn').addEventListener('click', downloadAll);
-$('listClose').addEventListener('click', closeEverything);
-$('cancelBtn').addEventListener('click', () => {
-  if (current) current.cancel();
-  if (lookup) lookup.abort();
-  endLoading();
-  afterPopup();
-  toast('Download cancelled.', 'info');
-});
-$('okBtn').addEventListener('click', afterPopup);
-$('errBtn').addEventListener('click', afterPopup);
-overlay.addEventListener('click', e => { if (e.target === overlay && !busy) closeEverything(); });
+$('cancelBtn').addEventListener('click', () => { activeToken = null; cleanup(); closePopup(); toast('Download cancelled.', 'info'); });
+$('okBtn').addEventListener('click', closePopup);
+$('errBtn').addEventListener('click', closePopup);
+overlay.addEventListener('click', e => { if (e.target === overlay && !busy) closePopup(); });
 </script>
 </body>
 </html>
